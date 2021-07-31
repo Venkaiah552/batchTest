@@ -3,7 +3,6 @@ package com.cvs.cdc.job;
 //import com.cvs.cdc.dto.EmployeeDTO;
 //import com.cvs.cdc.mapper.EmployeeFileRowMapper;
 
-import com.cvs.cdc.dto.EmployeeDTO;
 import com.cvs.cdc.model.*;
 //import com.cvs.cdc.model.Employee;
 import com.cvs.cdc.processor.CdcResponseProcessorApi;
@@ -18,15 +17,18 @@ import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepScope;
-import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.core.partition.support.MultiResourcePartitioner;
+import org.springframework.batch.core.partition.support.Partitioner;
+import org.springframework.batch.integration.async.AsyncItemProcessor;
+import org.springframework.batch.integration.async.AsyncItemWriter;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamReader;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.data.RepositoryItemReader;
 import org.springframework.batch.item.database.*;
-import org.springframework.batch.item.database.support.H2PagingQueryProvider;
 import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.file.FlatFileItemWriter;
-import org.springframework.batch.item.file.mapping.DefaultLineMapper;
+import org.springframework.batch.item.file.builder.FlatFileItemReaderBuilder;
+import org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper;
 import org.springframework.batch.item.file.transform.BeanWrapperFieldExtractor;
 import org.springframework.batch.item.file.transform.DelimitedLineAggregator;
 import org.springframework.batch.item.file.transform.DelimitedLineTokenizer;
@@ -39,22 +41,18 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 //import com.cvs.cdc.processor.EmployeeProcessorDemo1;
+import org.springframework.core.io.UrlResource;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
-import org.springframework.core.task.TaskExecutor;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
-import org.springframework.orm.jpa.JpaTransactionManager;
-import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
-import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
-import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.client.RestTemplate;
 
 import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
+import java.io.IOException;
+import java.net.MalformedURLException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -261,7 +259,7 @@ public class SpringBatchCdc {
     @Qualifier("entityManagerFactory")
     private EntityManagerFactory entityManagerFactory;
 
-    @Bean
+   /* @Bean
     public ItemStreamReader<CdcRequestToApi> immunizationJpaDbItemReader() throws Exception {
 
         //JpaPagingItemReader<CdcRequestToApi> jpaPagingItemReader = new JpaPagingItemReader<>();
@@ -270,23 +268,23 @@ public class SpringBatchCdc {
         JpaQueryProviderImpl<CdcRequestToApi> jpaQueryProviderImpl = new JpaQueryProviderImpl<>();
         jpaQueryProviderImpl.setQuery("CdcRequestToApi.findAll");
         jpaPagingItemReader.setQueryProvider(jpaQueryProviderImpl);
-        jpaPagingItemReader.setPageSize(2);
+        jpaPagingItemReader.setPageSize(50000);
         // must be set to false if multi threaded
         jpaPagingItemReader.setSaveState(false);
         //jpaPagingItemReader.setMaxItemCount(2);
         jpaPagingItemReader.afterPropertiesSet();
 
         return jpaPagingItemReader;
-    }
+    }*/
 
-    @Bean
+   /* @Bean
     public DataSource dataSource() {
-        /*teradata.datasource.driverClassName=com.teradata.jdbc.TeraDriver
+        *//*teradata.datasource.driverClassName=com.teradata.jdbc.TeraDriver
         teradata.datasource.jdbc-url=jdbc:teradata://TIDWDEV1
         teradata.datasource.username=IDW_STG_CPL
         teradata.datasource.password=rFh_9ghA
         teradata.jpa.database-platform=org.hibernate.dialect.TeradataDialect
-*/
+*//*
         HikariDataSource hikariDataSource = new HikariDataSource();
         hikariDataSource.setDriverClassName("com.teradata.jdbc.TeraDriver");
         hikariDataSource.setJdbcUrl("jdbc:teradata://TIDWDEV1");
@@ -297,24 +295,25 @@ public class SpringBatchCdc {
 
         return hikariDataSource;
     }
+*/
 
-
-    /*@Bean
+   /* @Bean
     public ItemReader<? extends CdcRequestToApi> reader() {
         JdbcPagingItemReader<CdcRequestToApi> reader = new JdbcPagingItemReader<>();
         reader.setDataSource(this.dataSource());
         //reader.setPageSize(2);
         reader.setRowMapper(new BeanPropertyRowMapper<CdcRequestToApi>(CdcRequestToApi.class));
 
-    *//*   TeradataPagingQueryProvider teradataPagingQueryProvider = new TeradataPagingQueryProvider();
+       TeradataPagingQueryProvider teradataPagingQueryProvider = new TeradataPagingQueryProvider();
          teradataPagingQueryProvider.setSelectClause("SELECT  sub.* ");
         teradataPagingQueryProvider.setFromClause("from (select ROW_NUMBER() over (order by  EXTR_DT,RXC_IMM_ID,JOB_NM  asc) rid, t.* from IDW_APPS_STG_VW.IMM_COVID_IDNTFD_EXTRACT t where t.actvy_typ_cd is null) sub");
-        teradataPagingQueryProvider.setWhereClause("sub.rid> 0 and sub.rid<=2");*//*
+        teradataPagingQueryProvider.setWhereClause("sub.rid> 0 and sub.rid<=2");
 
         final SqlPagingQueryProviderFactoryBean sqlPagingQueryProviderFactoryBean = new SqlPagingQueryProviderFactoryBean();
         sqlPagingQueryProviderFactoryBean.setDataSource(this.dataSource());
         sqlPagingQueryProviderFactoryBean.setSelectClause("select sub.* ");
-        sqlPagingQueryProviderFactoryBean.setFromClause("from (select ROW_NUMBER() over (order by  EXTR_DT,RXC_IMM_ID,JOB_NM  asc) rownum, t.* from IDW_APPS_STG_VW.IMM_COVID_IDNTFD_EXTRACT t where t.actvy_typ_cd is null) sub ");
+        sqlPagingQueryProviderFactoryBean.setFromClause("from (select ROW_NUMBER() over (order by  EXTR_DT,RXC_IMM_ID,JOB_NM  asc) rownum, " +
+                "t.* from IDW_APPS_STG_VW.IMM_COVID_IDNTFD_EXTRACT t where t.actvy_typ_cd is null) sub ");
         sqlPagingQueryProviderFactoryBean.setWhereClause("sub.rownum> 0 and sub.rownum<=2");
         Map<String, Order> sortKeys = new HashMap<>();
         sortKeys.put("JOB_NM", Order.ASCENDING);
@@ -332,8 +331,8 @@ public class SpringBatchCdc {
         }
       /// reader.setQueryProvider(teradataPagingQueryProvider);
         return reader;
-    }*/
-
+    }
+*/
 
 
 
@@ -359,23 +358,207 @@ public class SpringBatchCdc {
         return reader;
     }*/
 
-    @Bean
+   /* @Bean
     public Step step1DbtoApi() throws Exception {
         return this.stepBuilderFactory.get("step3")
-                .<CdcRequestToApi, CdcResponseToDb>chunk(2)
-                .reader(immunizationJpaDbItemReader()) // reader()
-                .processor(cdcresponseeprocessor)
-                .writer(cdcResponseDbWriter)  //employeeFileWriter() //cdcResponseDbWriter()
-                .taskExecutor(taskExecutor())
+                .<CdcRequestToApi, CdcResponseToDb>chunk(50000)
+                .reader(immunizationJpaDbItemReader()) //  //reader()
+                //.processor(cdcresponseeprocessor)
+                .processor(asyncItemProcessor())
+                //.writer(cdcResponseDbWriter)  //employeeFileWriter() //cdcResponseDbWriter()
+                .writer(asyncItemWriter())  //employeeFileWriter() //cdcResponseDbWriter()
+                //.taskExecutor(taskExecutor())
                 .build();
+    }*/
+
+    /*@Bean
+    public Step step1DbtoApi() throws Exception {
+        return this.stepBuilderFactory.get("step3")
+                .partitioner(slaveStep().getName(), partitioner1())
+                .step(slaveStep())
+                .gridSize(4)
+                .taskExecutor(new SimpleAsyncTaskExecutor())
+                .build();
+    }*/
+
+    /*@Bean
+    public Step slaveStep() {
+        return this.stepBuilderFactory.get("slaveStep")
+                .<CdcRequestToApi, CdcResponseToDb>chunk(1000)
+                .reader(pagingItemReader(null, null))
+                .processor(cdcresponseeprocessor)
+                .writer(cdcResponseDbWriter)
+                .build();
+    }*/
+
+   /* @Bean
+    public ColumnRangePartitioner partitioner1() {
+        ColumnRangePartitioner columnRangePartitioner = new ColumnRangePartitioner();
+        columnRangePartitioner.setDataSource(this.dataSource());
+        return columnRangePartitioner;
+    }*/
+
+  /*  @Bean
+    @StepScope
+    public JdbcPagingItemReader<CdcRequestToApi> pagingItemReader(
+            @Value("#{stepExecutionContext['minValue']}")Long minValue,
+            @Value("#{stepExecutionContext['maxValue']}")Long maxValue) {
+        System.out.println("reading " + minValue + " to " + maxValue);
+        JdbcPagingItemReader<CdcRequestToApi> reader = new JdbcPagingItemReader<>();
+
+        reader.setDataSource(this.dataSource());
+        reader.setFetchSize(1000);
+        reader.setRowMapper(new CdcRequestRowMapper());
+
+        TeradataPagingQueryProvider queryProvider = new TeradataPagingQueryProvider();
+
+        queryProvider.setSelectClause("(select ROW_NUMBER() over (order by  EXTR_DT,RXC_IMM_ID,JOB_NM  asc) rid, t.*  ");
+        queryProvider.setFromClause("from IDW_APPS_STG_VW.IMM_COVID_IDNTFD_EXTRACT t ");
+        queryProvider.setWhereClause("where t.actvy_typ_cd is null and batch_ts<= (select max(batch_ts) from IDW_APPS_STG_VW.CDC_API_EXTRACT_DRIVER) ) sub where rid >= " + minValue + " and rid < " + maxValue);
+
+        Map<String, Order> sortKeys = new HashMap<>(1);
+
+        sortKeys.put("JOB_NM", Order.ASCENDING);
+        sortKeys.put("EXTR_DT", Order.ASCENDING);
+        sortKeys.put("RXC_IMM_ID", Order.ASCENDING);
+
+
+        queryProvider.setSortKeys(sortKeys);
+
+        reader.setQueryProvider(queryProvider);
+
+        return reader;
+    }*/
+
+   /* @Bean
+    public AsyncItemProcessor asyncItemProcessor() throws Exception {
+        AsyncItemProcessor<CdcRequestToApi, CdcResponseToDb> asyncItemProcessor = new AsyncItemProcessor();
+
+        asyncItemProcessor.setDelegate(cdcresponseeprocessor);
+        asyncItemProcessor.setTaskExecutor(new SimpleAsyncTaskExecutor());
+        asyncItemProcessor.afterPropertiesSet();
+
+        return asyncItemProcessor;
     }
 
     @Bean
+    public AsyncItemWriter asyncItemWriter() throws Exception {
+        AsyncItemWriter<CdcResponseToDb> asyncItemWriter = new AsyncItemWriter<>();
+
+        asyncItemWriter.setDelegate(cdcResponseDbWriter);
+        asyncItemWriter.afterPropertiesSet();
+
+        return asyncItemWriter;
+    }*/
+
+    @Bean("partitioner")
+    @StepScope
+    public Partitioner partitioner() {
+        //log.info("In Partitioner");
+        MultiResourcePartitioner partitioner = new MultiResourcePartitioner();
+        ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
+        Resource[] resources = null;
+        try {
+            resources = resolver.getResources("/*.txt");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        partitioner.setResources(resources);
+        partitioner.partition(10);
+        return partitioner;
+    }
+    @Bean
+    public Step step1DbtoApi() throws Exception {
+        return this.stepBuilderFactory.get("step1DbtoApi")
+                                      .partitioner("step1", partitioner())
+                                      .step(step1())
+                                     // .gridSize(4)
+                                      .taskExecutor(taskExecutor())
+                                      .build();
+    }
+
+    @Bean
+    public Step step1() {
+        return stepBuilderFactory.get("step1")
+                .<CdcRequestToApi, CdcRequestToApi>chunk(500)
+                .reader(personItemReader)
+                .processor(cdcresponseeprocessor)
+                .writer(cdcResponseDbWriter)
+                .build();
+    }
+   /* @Bean
+    @Qualifier("masterStep")
+    public Step masterStep() {
+        return stepBuilderFactory.get("masterStep")
+                                 .partitioner("step1", partitioner())
+                                 .step(step1())
+                                 .taskExecutor(taskExecutor())
+                                 .build();
+    }*/
+
+    @Bean
+    public ThreadPoolTaskExecutor taskExecutor() {
+        ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
+        taskExecutor.setMaxPoolSize(10);
+        taskExecutor.setCorePoolSize(10);
+        taskExecutor.setQueueCapacity(10);
+        taskExecutor.afterPropertiesSet();
+        return taskExecutor;
+    }
+
+    @Autowired
+    private FlatFileItemReader<CdcRequestToApi> personItemReader;
+
+    @Autowired
+    private ExecutionContext executionContext;
+
+    @Bean
+    @StepScope
+    @Qualifier("personItemReader")
+    public FlatFileItemReader<CdcRequestToApi> personItemReader(@Value("#{stepExecutionContext['fileName']}") String filename) throws MalformedURLException {
+
+
+       executionContext.put("filename",filename);
+       // log.info("In Reader");
+        return new FlatFileItemReaderBuilder<CdcRequestToApi>()
+                .name("personItemReader")
+              //  .delimited()
+                //.names(new String[] { "firstName", "lastName" })
+                .lineTokenizer(new DelimitedLineTokenizer(DelimitedLineTokenizer.DELIMITER_TAB) {
+                    {
+                    setNames(new String[]{"vaxEventId", "extType", "pprlId","recipId","recipFirstName","recipMiddleName","recipLastName","recipDob",
+                    "recipSex", "recipAddressStreet", "recipAddressStreet_2", "recipAddressCity", "recipAddressCounty", "recipAddressState", "recipAddressZip", "recipRace1", "recipRace2", "recipRace3",
+                    "recipRace4", "recipRace5", "recipRace6", "recipEthnicity", "adminDate", "cvx", "ndc", "mvx", "lotNumber", "vaxExpiration",
+                    "vaxAdminSite", "vaxRoute", "doseNum",  "vaxSeriesComplete", "responsibleOrg", "adminName", "vtrcksProvPin", "adminType",
+                    "adminAddressStreet", "adminAddressStreet_2", "adminAddressCity", "adminAddressCounty", "adminAddressState", "adminAddressZip",
+                   "vaxRefusal", "cmorbidStatus", "serology" });
+                }
+                })
+
+                .fieldSetMapper(new BeanWrapperFieldSetMapper<CdcRequestToApi>() {
+                    {
+                        setTargetType(CdcRequestToApi.class);
+                    }
+                })
+
+                .resource(new  UrlResource(filename))
+                .build();
+    }
+
+   /* @Bean
     public TaskExecutor taskExecutor(){
-        SimpleAsyncTaskExecutor simpleAsyncTaskExecutor = new SimpleAsyncTaskExecutor();
+        //ThreadPoolExecutor
+       // ThreadPoolExecutor threadPoolExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(10);
+        ThreadPoolTaskExecutor threadPoolTaskExecutor = new ThreadPoolTaskExecutor();
+        //threadPoolTaskExecutor.
+
+
+        ////////////////////
+         SimpleAsyncTaskExecutor simpleAsyncTaskExecutor = new SimpleAsyncTaskExecutor();
         simpleAsyncTaskExecutor.setConcurrencyLimit(2);
         return  simpleAsyncTaskExecutor;
-    }
+        //return  threadPoolExecutor;
+    }*/
 
     private Map<String, Sort.Direction> sorts;
 

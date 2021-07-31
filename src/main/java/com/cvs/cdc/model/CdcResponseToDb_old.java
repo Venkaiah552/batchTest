@@ -1,15 +1,12 @@
+/*
 package com.cvs.cdc.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Immutable;
-import org.springframework.data.domain.Persistable;
 
 import javax.persistence.*;
-import java.io.Serializable;
-import java.util.Optional;
 
 
 @Builder
@@ -17,90 +14,55 @@ import java.util.Optional;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-@Table(name = "IDW_APPS_STG_VW.CDC_CDC_FILE_PROCESS")
-/*@IdClass(CompositeKey.class)*/
-@Immutable
+@Table(name = "IDW_APPS_STG_VW.CDC_API_UPLOAD_STATUS")
+@IdClass(CompositeKey2.class)
 
+*/
 /*@JsonIdentityInfo(
         generator = ObjectIdGenerators.PropertyGenerator.class,
-        property = "cdcId")*/
+        property = "cdcId")*//*
+
 //@EqualsAndHashCode(exclude = {"attributeOfTypeList", "attributeOfTypeSet"})
-public class CdcResponseToDb implements Serializable {
+public class CdcResponseToDb_old */
+/*implements Persistable<CdcResponseToDb>*//*
+ {
 
-    /* @EmbeddedId
-     private CompositeKey cdcResponseKey;*/
+    */
+/* @EmbeddedId
+     private CompositeKey cdcResponseKey;*//*
 
-    @Column(name = "FILE_NM")
     @Id
-    private String fileNm;
+    @Column(name = "vax_event_id")
+    private String vaxEventId;
+
+    @Column(name = "RXC_IMM_ID")
+    @Id
+    private String rxcImmId;
 
     @Column(name = "EXTR_DT")
+    @Id
     private String extrDt;
 
     @Column(name = "JOB_NM")
+    @Id
     private String jobNm;
 
-    @Column(name = "FILE_REC_CNT")
-    private String fileRecCnt;
+    @Column(name = "ACTVY_TYP_CD")
+    private String activityTypCd;
 
-    @Column(name = "FILE_CRTE_TS")
-    private String fileCrteTs;
-
-    @Column(name = "APP_INIT_TS")
-    private String appInitTs;
-
-    @Column(name = "VAL_RSPNS_TS")
-    private String valRspnsTs;
-
-    @Column(name = "VAL_PROCESS_CNT")
-    private String valProcessCnt;
-
-    @Column(name = "VAL_ERROR_CNT")
-    private String valErrorCnt;
-
-    @Column(name = "UPLOAD_RSPNS_TS")
-    private String uploadRspnsTs;
-
-    @Column(name = "UPLOAD_PROCESS_CNT")
-    private String uploadProcessCnt;
-
-    @Column(name = "UPLOAD_ERROR_CNT")
-    private String uploadErrorCnt;
+    @Column(name = "RESULT_CD")
+    private String resultCd;
 
     @Column(name = "STATUS_CD")
     private String statusCd;
 
-
-
-
-
-
-
-    /*@Column(name = "RXC_IMM_ID")
-    @Id
-    private String rxcImmId;*/
-
-
-
-
-
-
-   /* @Column(name = "ACTVY_TYP_CD")
-    private String activityTypCd;
-
-    @Column(name = "RESULT_CD")
-    private String resultCd;*/
-
-   /* @Column(name = "STATUS_CD")
-    private String statusCd;
-
     @Column(name = "INSRT_TS")
-    private String insrtTs;*/
+    private String insrtTs;
 
-   /* @Column(name = "UPDT_TS")
-    private String updtTs;*/
+    @Column(name = "UPDT_TS")
+    private String updtTs;
 
-   /* @Column(name = "VAL_STATUS_MSG")
+    @Column(name = "VAL_STATUS_MSG")
     private String valStatusMsg;
 
     @Column(name = "UPLOAD_STATUS_MSG")
@@ -111,22 +73,28 @@ public class CdcResponseToDb implements Serializable {
 
     @Column(name="RSPNS_TS")
     private String rspnsTs;
+
+    @Override
+    public String toString() {
+        return "CdcResponseToDb{" +
+                "vaxEventId='" + vaxEventId + '\'' +
+                ", rxcImmId='" + rxcImmId + '\'' +
+                ", extrDt='" + extrDt + '\'' +
+                ", jobNm='" + jobNm + '\'' +
+                ", activityTypCd='" + activityTypCd + '\'' +
+                ", resultCd='" + resultCd + '\'' +
+                ", statusCd='" + statusCd + '\'' +
+                ", insrtTs='" + insrtTs + '\'' +
+                ", updtTs='" + updtTs + '\'' +
+                ", valStatusMsg='" + valStatusMsg + '\'' +
+                ", uploadStatusMsg='" + uploadStatusMsg + '\'' +
+                ", upldTs='" + upldTs + '\'' +
+                ", rspnsTs='" + rspnsTs + '\'' +
+                '}';
+    }
+
+
 */
-
-
-    /*@Override
-    public CompositeKey getId() {
-        return CompositeKey.builder().vaxEventId(vaxEventId).extrDt(extrDt).jobNm(jobNm).build();
-    }*/
-
-    /*@Override
-    public boolean isNew() {
-
-       if(vaxEventId == null || extrDt == null || jobNm == null)
-        return true;
-       else
-           return false;
-    }*/
 /*
 
 
@@ -154,17 +122,23 @@ public class CdcResponseToDb implements Serializable {
     private String cdcStatusMessage;
     @Column(name="vax_event_id")
     private String vaxEventId;
-   */
+   *//*
+
+*/
 /* @OneToOne(cascade = CascadeType.ALL fetch = FetchType.LAZY,optional = false)
     @JoinColumn(name = "cdc_vax_event_id", referencedColumnName = "vax_event_id")
     @JsonManagedReference
     @JsonBackReference*//*
+*/
+/*
 
    // @JsonIgnore
    private CdcRequestToApi cdcRequestToApi;
-*/
+*//*
 
-    /*@Override
+
+    */
+/*@Override
     public CdcResponseToDb getId() {
         return CdcResponseToDb.builder().cdcId(cdcId)
                 .cdcRequestToApi(cdcRequestToApi)
@@ -175,8 +149,10 @@ public class CdcResponseToDb implements Serializable {
     @Override
     public boolean isNew() {
         return false;
-    }*/
+    }*//*
+
 
     //It is addition of validation and processing errors
 
 }
+*/

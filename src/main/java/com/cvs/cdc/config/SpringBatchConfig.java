@@ -39,6 +39,7 @@ public class SpringBatchConfig extends DefaultBatchConfigurer {
     public void setDataSource(DataSource dataSource) {
         // override to do not set datasource even if a datasource exist.
         // initialize will use a Map based JobRepository (instead of database)
+        System.out.println(" datasource value is "+dataSource);
     }
     @Autowired
     @Qualifier("userItemProcessor")
@@ -48,8 +49,8 @@ public class SpringBatchConfig extends DefaultBatchConfigurer {
     @Qualifier("userItemWriter")
     private ItemWriter itemWriter;
 
-    @Value("org/springframework/batch/core/schema-teradata.sql")
-    private Resource dropRepositoryTables;
+    /*@Value("org/springframework/batch/core/schema-teradata.sql")
+    private Resource dropRepositoryTables;*/
 
     @Bean
     public Job job(JobBuilderFactory jobBuilderFactory,
@@ -103,7 +104,7 @@ public class SpringBatchConfig extends DefaultBatchConfigurer {
         return defaultLineMapper;
     }
 
-    /*@Bean
+    @Bean
     public DataSource dataSource(){
 
 
@@ -115,7 +116,7 @@ public class SpringBatchConfig extends DefaultBatchConfigurer {
         hikariDataSource.setMaximumPoolSize(10);
         return hikariDataSource;
 
-    }*/
+    }
     /*@Bean
     public JdbcTemplate jdbcTemplate(){
         return new JdbcTemplate(dataSource());

@@ -24,11 +24,11 @@ import java.sql.SQLException;
 public class CdcRequestRowMapper implements RowMapper<CdcRequestToApi> {
 	@Override
 	public CdcRequestToApi mapRow(ResultSet resultSet, int i) throws SQLException {
-		return new CdcRequestToApi(resultSet.getString("vaxEventId"),
-				resultSet.getString("rxcImmId"),
-				resultSet.getString("extrDt"),
-				resultSet.getString("jobNm"),
-				resultSet.getString("extType"),
-				resultSet.getString("vaxEventId"));
+		return new CdcRequestToApi(resultSet.getString("vax_event_id"),
+				resultSet.getString("RXC_IMM_ID"),
+				resultSet.getString("EXTR_DT"),
+				resultSet.getString("JOB_NM"),
+				resultSet.getString("ext_type")
+				);
 	}
 }

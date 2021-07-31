@@ -10,12 +10,28 @@ import java.util.Map;
 public class TeradataPagingQueryProvider extends AbstractSqlPagingQueryProvider {
     @Override
     public String generateFirstPageQuery(int pageSize) {
-        return SqlPagingQueryUtils.generateRowNumSqlQuery(this, false, this.buildRowNumClause(pageSize));
+        //StringBuffer stringBuffer = new StringBuffer(SqlPagingQueryUtils.generateRowNumSqlQuery(this, false, ""));
+       // StringBuffer stringBuffer1 = null;
+
+        //stringBuffer1 = new StringBuffer(SqlPagingQueryUtils.generateRowNumSqlQuery(this, false, "")).delete(15,23).delete(342,351);
+        /*String sql = SqlPagingQueryUtils.generateRowNumSqlQuery(this, false, "");
+        String sql1 = sql.replace("(SELECT ","");*/
+        //return  stringBuffer1.toString();
+        String string = SqlPagingQueryUtils.generateRowNumSqlQuery(this, false, "").replace("(SELECT ","");
+        String string1 = string.replace(") WHERE","");
+        return string1;
     }
 
     @Override
     public String generateRemainingPagesQuery(int pageSize) {
-        return SqlPagingQueryUtils.generateRowNumSqlQuery(this, true, this.buildRowNumClause(pageSize));
+       // StringBuffer stringBuffer1 = null;
+       // stringBuffer1 =   new StringBuffer(SqlPagingQueryUtils.generateRowNumSqlQuery(this, true, "")).delete(15,23).delete(342,351);
+       // return SqlPagingQueryUtils.generateRowNumSqlQuery(this, true, "");
+        String string = SqlPagingQueryUtils.generateRowNumSqlQuery(this, true, "").replace("(SELECT ","");
+        String string1 = string.replace(") WHERE","");
+        String string2 = string1.replace("  AND ((EXTR_DT > ?) OR (EXTR_DT = ? AND RXC_IMM_ID > ?) OR (EXTR_DT = ? AND RXC_IMM_ID = ? AND JOB_NM > ?))","");
+        return  string2;
+        //return stringBuffer1.toString();
     }
 
     @Override
@@ -24,7 +40,8 @@ public class TeradataPagingQueryProvider extends AbstractSqlPagingQueryProvider 
         int offset = page * pageSize;
         offset = offset == 0 ? 1 : offset;
         String sortKeySelect = this.getSortKeySelect();
-        return SqlPagingQueryUtils.generateRowNumSqlQueryWithNesting(this, sortKeySelect, sortKeySelect, false, "TMP_ROW_NUM = " + offset);
+        String string = SqlPagingQueryUtils.generateRowNumSqlQueryWithNesting(this, sortKeySelect, sortKeySelect, false, "TMP_ROW_NUM = " + offset);
+        return string;
     }
     private String getSortKeySelect() {
         StringBuilder sql = new StringBuilder();
@@ -42,6 +59,7 @@ public class TeradataPagingQueryProvider extends AbstractSqlPagingQueryProvider 
     }
 
     private String buildRowNumClause(int pageSize) {
-        return "ROWNUM <= " + pageSize;
+        return "";//pageSize + " = " + pageSize
+        // return "ROWNUM <= " + pageSize;
     }
 }

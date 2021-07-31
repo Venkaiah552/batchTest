@@ -1,3 +1,4 @@
+/*
 package com.cvs.cdc.model;
 
 import lombok.AllArgsConstructor;
@@ -11,22 +12,21 @@ import javax.persistence.Embedded;
 import javax.persistence.EmbeddedId;
 import java.io.Serializable;
 
-//@Embeddable
+@Embeddable
 //@EmbeddedId
 //@Embedded
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @Data
-public class CompositeKey implements Serializable {
-    private static final long serialVersionUID = 1345785245214L;
-    //@Column(name="JOB_NM")
+public class CompositeKey2 implements Serializable {
+    @Column(name="JOB_NM")
     private String jobNm;
-    //@Column(name="EXTR_DT")
+    @Column(name="EXTR_DT")
     private String extrDt;
     //The below is used only when reading from db is done.
-    // @Column(name="RXC_IMM_ID")
-    // private String rxcImmId;
-    // @Column(name="vax_event_id")
+   // @Column(name="RXC_IMM_ID")
+   // private String rxcImmId;
+   @Column(name="vax_event_id")
     private String vaxEventId;
-}
+}*/

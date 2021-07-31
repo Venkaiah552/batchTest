@@ -1,6 +1,5 @@
 package com.cvs.cdc.model;
 
-import com.fasterxml.jackson.annotation.*;
 import lombok.*;
 import org.hibernate.annotations.Immutable;
 
@@ -21,9 +20,9 @@ import javax.persistence.*;
 /*@JsonIdentityInfo(
         generator = ObjectIdGenerators.PropertyGenerator.class,
         property = "vaxEventId")*/
-@NamedQueries({
+/*@NamedQueries({
         @NamedQuery(name = "CdcRequestToApi.findAll", query = "select u from CdcRequestToApi u")
-})
+})*/
 /*@NamedNativeQueries({
         @NamedNativeQuery(name = "selectAuthorNames", query = "select * from IDW_APPS_STG_VW.IMM_COVID_IDNTFD_EXTRACT"),
         *//*@NamedNativeQuery(name = "selectAuthorEntities", query = "SELECT a.id, a.version, a.firstname, a.lastname FROM Author a", resultClass = Author.class),
@@ -38,7 +37,7 @@ public class CdcRequestToApi {
 
     public CdcRequestToApi(String vaxEventId, String rxcImmId, String extrDt, String jobNm, String extType) {
         this.vaxEventId = vaxEventId;
-        this.rxcImmId = rxcImmId;
+       // this.rxcImmId = rxcImmId;
         this.extrDt = extrDt;
         this.jobNm = jobNm;
         this.extType = extType;
@@ -46,14 +45,6 @@ public class CdcRequestToApi {
     /*@EmbeddedId
     private CompositeKey cdcResponseKey;*/
    // @Id
-    @Column(name="vax_event_id")
-    private String vaxEventId;
-
-    @Column(name="RXC_IMM_ID")
-    @Id
-    private String rxcImmId;
-
-
 
     @Column(name="EXTR_DT")
     @Id
@@ -62,6 +53,9 @@ public class CdcRequestToApi {
     @Column(name="JOB_NM")
     @Id
     private String jobNm;
+
+    @Column(name="vax_event_id")
+    private String vaxEventId;
 
     @Column(name="ext_type ")
     private String extType;
@@ -81,11 +75,31 @@ public class CdcRequestToApi {
     @Column(name="recip_last_name")
     private String recipLastName;
 
+
+
+    //The below is used only when reading from db is done.
+   /* @Column(name="RXC_IMM_ID")
+    @Id
+    private String rxcImmId;*/
+
+
+
+
+
+
+
+
+
+
+
     @Column(name="recip_dob")
     private String recipDob;
 
+  /*  @Column(name="recip_sex")
+    private Character recipSex;*/
+
     @Column(name="recip_sex")
-    private Character recipSex;
+    private String recipSex;
 
     @Column(name="recip_address_street")
     private String recipAddressStreet;
@@ -236,6 +250,10 @@ public class CdcRequestToApi {
     private String uploadStatusMsg;
 
 
-    public CdcRequestToApi(String vaxEventId, String rxcImmId, String extrDt, String jobNm, String extType, String vaxEventId1) {
-    }
+    private String fileName;
+
+
+
+
+
 }

@@ -72,7 +72,7 @@ public class SqlPagingQueryProviderFactoryBean implements FactoryBean<PagingQuer
 	private Map<DatabaseType, AbstractSqlPagingQueryProvider> providers = new HashMap<>();
 
 
-	{
+	/*{
 		providers.put(DB2, new Db2PagingQueryProvider());
 		providers.put(DB2VSE, new Db2PagingQueryProvider());
 		providers.put(com.cvs.cdc.reader.DatabaseType.DB2ZOS, new Db2PagingQueryProvider());
@@ -87,7 +87,7 @@ public class SqlPagingQueryProviderFactoryBean implements FactoryBean<PagingQuer
 		providers.put(com.cvs.cdc.reader.DatabaseType.SQLSERVER,new SqlServerPagingQueryProvider());
 		providers.put(com.cvs.cdc.reader.DatabaseType.SYBASE,new SybasePagingQueryProvider());
 		providers.put(com.cvs.cdc.reader.DatabaseType.TERADATA, new TeradataPagingQueryProvider());
-	}
+	}*/
 	
 	/**
 	 * @param groupClause SQL GROUP BY clause part of the SQL query string

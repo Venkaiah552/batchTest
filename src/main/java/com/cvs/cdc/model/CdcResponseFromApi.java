@@ -21,7 +21,9 @@ public class CdcResponseFromApi {
     public List<String> processingErrors;
     public StorageResult storageResult;
     private String vaxEventId;
-    private CdcRequestToApi cdcRequestToApi;
+    public int totalRecords;
+    public int validationErrorsCount;
+    public boolean truncated;
 
 
 }

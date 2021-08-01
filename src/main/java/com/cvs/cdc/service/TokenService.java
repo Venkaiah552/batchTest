@@ -1,6 +1,9 @@
 package com.cvs.cdc.service;
 
+import com.cvs.cdc.model.TokenResponse;
+import com.cvs.cdc.model.OperationType;
+
 @FunctionalInterface
 public interface TokenService {
-    void getTokenResponse();
+    TokenResponse getTokenResponse(OperationType operationType);
 }

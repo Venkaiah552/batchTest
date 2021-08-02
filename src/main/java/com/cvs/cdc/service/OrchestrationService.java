@@ -52,11 +52,12 @@ public class OrchestrationService {
             for (String line : lines) {
                 ValidationError validationError = new ValidationError();
                 validationError.setDchRspnsId(id);
-                String[] data = line.split("[:;=]");
+                String[] data = line.split(" ", 5);
                 validationError.setLine(data[0]);
-                validationError.setVaxEventId(data[1]);
-                validationError.setRecipId(data[2]);
-                validationError.setField(data[3]);
+                validationError.setVaxEventId(data[1].split("=")[1]);
+                validationError.setRecipId(data[2].split("=")[1]);
+                validationError.setField(data[3].split("=")[1]);
+                validationError.setMessage(data[4].split("=")[1]);
                 validationErrorList.add(validationError);
             }
         } else {

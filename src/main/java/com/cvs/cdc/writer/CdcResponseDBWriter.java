@@ -32,12 +32,12 @@ public class CdcResponseDBWriter implements ItemWriter<CdcRequestToApi> {
 
         log.info("calling orchestration service with payload of size {}", listCdcResponseToDb.size());
         orchestrationService.processData((List<CdcRequestToApi>) listCdcResponseToDb);
-        listCdcResponseToDb.stream().forEach(x -> System.out.println("Record::: extract dt::" + x.getExtrDt() + " vaxEventId::" + x.getVaxEventId() +
-                " jobnm::" + x.getJobNm()));
+        listCdcResponseToDb.stream().forEach(x -> System.out.println("Record::: extract dt::" + x.getExtrDt() + " vaxEventId::" + x.getVaxEventId()
+               ));
         List<? extends CdcRequestToApi> list1CdcResponseToDb = listCdcResponseToDb.stream().filter(x -> !(x.getVaxEventId().equalsIgnoreCase("vax_event_id"))).collect(Collectors.toList());
         System.out.println("count of records getting updated to db::: " + list1CdcResponseToDb.size() + "\n");
         list1CdcResponseToDb.stream().forEach(x -> System.out.println("Record::: extract dt::" + x.getExtrDt() + " vaxEventId::" + x.getVaxEventId() +
-                " jobnm::" + x.getJobNm()));
+                " jobnm::" ));
 
     }
 

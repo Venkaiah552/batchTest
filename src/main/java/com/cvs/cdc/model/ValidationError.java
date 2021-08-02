@@ -14,6 +14,7 @@ public class ValidationError {
     private String vaxEventId;
     private String recipId;
     private String field;
+    private String message;
 
 
 }
